@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -86,6 +87,14 @@ namespace Chapter08
             }
             else
                 throw new ArgumentException("Parameter is not a Car!");
+        }
+
+        public static IComparer SortByPetName
+        {
+            get
+            {
+                return (IComparer)new PetNameComparer();
+            }
         }
     }
 }

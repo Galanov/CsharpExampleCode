@@ -15,7 +15,9 @@ namespace Chapter08
             //ExampleManyInterfaces();
             //ExampleInterfaceHierarchy();
             //ExampleIEnumerable();
-            ExampleIClonebale();
+            //ExampleIClonebale();
+            ExampleIComparable();
+
             Console.WriteLine("Hello World!");
         }
 
@@ -187,7 +189,13 @@ namespace Chapter08
             carArray[3] = new Car("Mel", 40,4);
             carArray[4] = new Car("Chucky", 40, 5);
 
-            Array.Sort(carArray);
+            Array.Sort(carArray, new PetNameComparer());
+            Array.Sort(carArray, Car.SortByPetName);
+
+            foreach (var car in carArray)
+            {
+                Console.WriteLine($"{car.CarID}, {car.PetName}");
+            }
         }
     }
 }

@@ -262,6 +262,7 @@ namespace Chapter09
         }
 
         static void Swap<T>(ref T a, ref T b)
+            where T : struct
         {
             Console.WriteLine("You sent the Swap() method a {0}", typeof(T));
             T temp = a;
@@ -278,10 +279,10 @@ namespace Chapter09
             Console.WriteLine("After swap: {0}, {1}", a, b);
             Console.WriteLine();
             // Обмен двух строковых значений,
-            string si = "Hello", s2 = "There";
-            Console.WriteLine("Before swap: {0} {1}'", si, s2);
-            Swap<string>(ref si, ref s2);
-            Console.WriteLine("After swap: {0} {1}!", si, s2);
+            //string si = "Hello", s2 = "There";
+            //Console.WriteLine("Before swap: {0} {1}'", si, s2);
+            //Swap<string>(ref si, ref s2);
+            //Console.WriteLine("After swap: {0} {1}!", si, s2);
         }
     }
 }

@@ -8,6 +8,8 @@ namespace Chapter10.Models
     {
         //1. Определить тип делегата.
         public delegate void CarEngineHandler(string msgForCaller);
+
+        
         //2. Определить переменную-член этого типа делегата.
         private CarEngineHandler listOfHandlers;
         // 3. Добавить регистрационную функцию для вызывающего кода.
@@ -68,6 +70,77 @@ namespace Chapter10.Models
         public void UnRegisterWithCarEngine(CarEngineHandler methodToCall)
         {
             listOfHandlers -= methodToCall;
+        }
+    }
+
+    public class Car2
+    {
+        private bool carlsDead;
+        public int CurrentSpeed { get; set; }
+        public int MaxSpeed { get; set; } = 100;
+
+        public delegate void CarEngineHandler(string msgForCaller);
+
+        public CarEngineHandler listOfHandlers;
+
+        public void Accelerate(int delata)
+        {
+            if (listOfHandlers != null)
+            {
+                listOfHandlers("Sorry, this car is dead...");
+            }
+        }
+    }
+
+    public class CarEvent
+    {
+        private bool carIsDead;
+        public int CurrentSpeed { get; set; }
+        public int MaxSpeed { get; set; } = 100;
+        public string PetName { get; set; }
+
+        //public delegate void CarEngineHandler(string msg);
+        public delegate void CarEngineHandler(object sender, CarEventArgs e);
+
+        //public event CarEngineHandler Exploded;
+        //public event CarEngineHandler AboutToBlow;
+
+        public event EventHandler<CarEventArgs> Exploded;
+        public event EventHandler<CarEventArgs> AboutToBlow;
+
+        public CarEvent(string name, int maxSp, int currSp)
+        {
+            CurrentSpeed = currSp;
+            MaxSpeed = maxSp;
+            PetName = name;
+        }
+
+        public void Accelerate(int delta)
+        {
+            if (carIsDead)
+            {
+                //if (Exploded != null)
+                //{
+                //    Exploded("Sorry, this car is dead...");
+                //}
+                Exploded?.Invoke(this, new CarEventArgs("Sorry, this car is dead..."));
+            }
+            else
+            {
+                CurrentSpeed += delta;
+                if (10 == MaxSpeed - CurrentSpeed && AboutToBlow != null)
+                {
+                    AboutToBlow?.Invoke(this, new CarEventArgs( "Careful buddy! Gonna blow"));
+                }
+                if (CurrentSpeed >= MaxSpeed)
+                {
+                    carIsDead = true;
+                }
+                else
+                {
+                    Console.WriteLine("CurrentSpeed = {0}", CurrentSpeed);
+                }
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Chapter10.Models;
 using System;
+using System.Collections.Generic;
 
 namespace Chapter10
 {
@@ -10,7 +11,16 @@ namespace Chapter10
             //ExampleDelegate();
             //ExampleNotificationDelegate();
             //ExanpleGenericDelegate();
-            ExampleAction();
+            //ExampleAction();
+            //ExamplePablicDelegate();
+            //ExampleEvent();
+            //AnonymusMethodExample();
+            //AnonymousLocal();
+            //TraditionalDelegateSyntax();
+            //AnonymousMethodSyntax();
+            //LambdsExpressionSyntax();
+            //LambdaExample();
+            CarEventLambda();
             Console.WriteLine("Hello World!");
         }
 
@@ -142,6 +152,195 @@ namespace Chapter10
 
             string sum = funcTarget2(90, 300);
             Console.WriteLine(sum);
+        }
+
+        static void CallWhenExploded(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+        static void CallHereToo(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+        static void ExamplePablicDelegate()
+        {
+            Car2 myCar = new Car2();
+            myCar.listOfHandlers = new Car2.CarEngineHandler(CallWhenExploded);
+            myCar.Accelerate(10);
+
+            myCar.listOfHandlers = new Car2.CarEngineHandler(CallHereToo);
+            myCar.Accelerate(10);
+
+            myCar.listOfHandlers.Invoke("hee, hee, hee ...");
+
+        }
+
+        static void ExampleEvent()
+        {
+            CarEvent c1 = new CarEvent("SlugBug", 100, 10);
+            //c1.AboutToBlow += new CarEvent.CarEngineHandler(CarIsAlmostDoomed);
+            //c1.AboutToBlow += new CarEvent.CarEngineHandler(CarAboutToBlow);
+            //упрощенная запись
+            c1.AboutToBlow += CarAboutToBlow;
+            //CarEvent.CarEngineHandler d = new CarEvent.CarEngineHandler(CarExploded);
+            //c1.Exploded += d;
+
+            for (int i = 0; i < 6; i++)
+            {
+                c1.Accelerate(20);
+            }
+            //c1.Exploded -= d;
+
+            for (int i = 0; i < 6; i++)
+            {
+                c1.Accelerate(20);
+            }
+        }
+
+        static void CarAboutToBlow(object sender, CarEventArgs e)
+        {
+            if (sender is CarEvent)
+            {
+                CarEvent c = (CarEvent)sender;
+                Console.WriteLine("Critical Message from {0}: {1}", c.PetName, e.msg);
+            }
+        }
+
+        static void CarAboutToBlow(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+
+        static void CarIsAlmostDoomed(string msg)
+        {
+            Console.WriteLine("=> Critical Message from car: {0}", msg);
+        }
+
+        static void CarExploded(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+
+        static void AnonymusMethodExample()
+        {
+            CarEvent c1 = new CarEvent("SlugBug", 100, 10);
+            c1.AboutToBlow += delegate {
+                Console.WriteLine("Eek! Going to fast");
+
+	};
+            c1.AboutToBlow += delegate(object sender, CarEventArgs e ){
+                Console.WriteLine("Mesage from Car {0}", e.msg);
+
+	};
+            c1.Exploded += delegate (object sender, CarEventArgs e){
+                Console.WriteLine("Fatal Message from car: {0}", e.msg);
+
+	};
+            for (int i = 0; i < 6; i++)
+            {
+                c1.Accelerate(20);
+            }
+        }
+
+        static void AnonymousLocal()
+        {
+            int aboutToBlowCounter = 0;
+            CarEvent c1 = new CarEvent("SlugBug", 100, 10);
+            c1.AboutToBlow +=delegate {
+
+                aboutToBlowCounter++;
+                Console.WriteLine("Eek! Going too fast!");
+	};
+            c1.AboutToBlow += delegate(object sender, CarEventArgs e)
+            {
+                aboutToBlowCounter++;
+                Console.WriteLine("critical message from car: {0}", e.msg);
+            };
+            for (int i = 0; i < 6; i++)
+            {
+                c1.Accelerate(20);
+            }
+            Console.WriteLine("aboutToBlow event was fired {0} times", aboutToBlowCounter);
+        }
+
+        static void TraditionalDelegateSyntax()
+        {
+            List<int> list = new List<int>();
+            list.AddRange(new int[] { 20, 1, 4, 8, 9, 44 });
+            Predicate<int> callback = IsEvenNumber;
+            List<int> evenNumbers = list.FindAll(callback);
+            Console.WriteLine("Here are your even numbers");
+            foreach (var evenNumber in evenNumbers)
+            {
+                Console.WriteLine($"{evenNumber}\t");
+            }
+        }
+
+        static bool IsEvenNumber(int i)
+        {
+            return (i % 2) == 0;
+        }
+
+        static void AnonymousMethodSyntax()
+        {
+            List<int> list = new List<int>();
+            list.AddRange(new int[] { 20, 1, 4, 8, 9, 44 });
+            List<int> evenNumbers = list.FindAll(delegate (int i) {
+                return (i % 2) == 0;
+             });
+            Console.WriteLine("Here are your even numbers");
+            foreach (var evenNumber in evenNumbers)
+            {
+                Console.WriteLine($"{evenNumber}\t");
+            }
+        }
+
+        static void LambdsExpressionSyntax()
+        {
+            List<int> list = new List<int>();
+            list.AddRange(new int[] { 20, 1, 4, 8, 9, 44 });
+            List<int> evenNumbers = list.FindAll(i =>
+            {
+                Console.WriteLine("value of i is currently: {0}", i);
+                bool isEven = (i % 2) == 0;
+                return isEven;
+            });
+            Console.WriteLine("Here are your even numbers");
+            foreach (var evenNumber in evenNumbers)
+            {
+                Console.WriteLine($"{evenNumber}\t");
+            }
+        }
+        delegate string VerySimpleDelegate();
+
+        static void LambdaExample()
+        {
+            SimpleMathLambda m = new SimpleMathLambda();
+            m.SetMathHandler((msg, result) =>
+            {
+                Console.WriteLine("Message: {0}, Result: {1}", msg, result);
+            });
+
+            m.Add(10, 10);
+
+            VerySimpleDelegate d = new VerySimpleDelegate(() =>
+            {
+                return "Enjoy your string!";
+            });
+
+            Console.WriteLine(d());
+
+        }
+
+        static void CarEventLambda()
+        {
+            CarEvent c1 = new CarEvent("SlugBug", 100, 10);
+            c1.AboutToBlow += (sender, e) => { Console.WriteLine(e.msg); };
+            c1.Exploded += (sender, e) => { Console.WriteLine(e.msg); };
+            for (int i = 0; i < 6; i++)
+            {
+                c1.Accelerate(20);
+            }
         }
     }
 }
